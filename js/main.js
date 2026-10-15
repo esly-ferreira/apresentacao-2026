@@ -367,7 +367,46 @@
 
   const personModal = document.querySelector(".person-modal");
   const personPanel = personModal.querySelector(".person-modal__panel");
+  const modalPhotoBox = personModal.querySelector(".person-modal__photo");
   let personReturn = null;
+  let photoToken = 0;
+
+  function setModalPhoto(photo, name) {
+    const modalPhoto = modalPhotoBox.querySelector("img");
+    const token = ++photoToken;
+    const thumb = photo?.getAttribute("src") ? photo.currentSrc || photo.src : "";
+    const full = photo?.dataset.full || thumb;
+
+    modalPhoto.onload = modalPhoto.onerror = null;
+    modalPhoto.removeAttribute("src");
+    modalPhoto.alt = name;
+
+    if (!full) {
+      modalPhotoBox.style.removeProperty("--thumb");
+      modalPhotoBox.classList.remove("is-loading");
+      modalPhoto.hidden = true;
+      return;
+    }
+
+    modalPhotoBox.style.setProperty("--thumb", `url("${thumb.replace(/"/g, "%22")}")`);
+    modalPhotoBox.classList.add("is-loading");
+    modalPhoto.hidden = false;
+
+    const reveal = () => {
+      if (token !== photoToken) return;
+      modalPhotoBox.classList.remove("is-loading");
+    };
+    modalPhoto.onload = () => {
+      if (modalPhoto.decode) modalPhoto.decode().then(reveal, reveal);
+      else reveal();
+    };
+    modalPhoto.onerror = () => {
+      if (token !== photoToken) return;
+      modalPhoto.hidden = true;
+      modalPhotoBox.classList.remove("is-loading");
+    };
+    modalPhoto.src = full;
+  }
 
   function openPersonModal(person) {
     const name = person.querySelector(".person-name")?.textContent.trim() || "";
@@ -375,7 +414,6 @@
     const groupLabel = person.closest(".t-lead, .t-group")?.querySelector(".team-label");
     const sector = groupLabel ? groupLabel.childNodes[0].textContent.trim() : "";
     const photo = person.querySelector(".photo img");
-    const modalPhoto = personModal.querySelector(".person-modal__photo img");
 
     personModal.querySelector(".person-modal__sector").textContent = sector;
     personModal.querySelector(".person-modal__name").textContent = name;
@@ -389,14 +427,7 @@
       list.append(li);
     });
 
-    if (photo && photo.getAttribute("src")) {
-      modalPhoto.src = photo.dataset.full || photo.currentSrc || photo.src;
-      modalPhoto.alt = name;
-      modalPhoto.hidden = false;
-    } else {
-      modalPhoto.removeAttribute("src");
-      modalPhoto.hidden = true;
-    }
+    setModalPhoto(photo, name);
 
     personReturn = document.activeElement;
     personModal.hidden = false;
@@ -426,6 +457,14 @@
     const name = person.querySelector(".person-name")?.textContent.trim() || "pessoa do time";
     person.setAttribute("aria-label", `Ver detalhes de ${name}`);
     person.addEventListener("click", () => openPersonModal(person));
+
+    const full = person.querySelector(".photo img")?.dataset.full;
+    if (!full) return;
+    const preload = () => {
+      new Image().src = full;
+    };
+    person.addEventListener("pointerenter", preload, { once: true });
+    person.addEventListener("focus", preload, { once: true });
   });
 
   // ============================================
