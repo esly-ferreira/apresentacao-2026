@@ -91,6 +91,22 @@
 
   document.addEventListener("keydown", (event) => {
     if (event.altKey || event.ctrlKey || event.metaKey) return;
+
+    if (document.body.classList.contains("person-open")) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closePersonModal();
+      }
+      return;
+    }
+
+    const person = event.target.closest && event.target.closest(".person");
+    if (person && (event.key === "Enter" || event.key === " ")) {
+      event.preventDefault();
+      openPersonModal(person);
+      return;
+    }
+
     const onButton = event.target.closest && event.target.closest("button");
 
     switch (event.key) {
@@ -296,6 +312,120 @@
     const drop = () => img.remove();
     if (img.complete && !img.naturalWidth) drop();
     else img.addEventListener("error", drop, { once: true });
+  });
+
+  document.querySelectorAll(".photo").forEach((photo) => {
+    ["holo", "sheen"].forEach((name) => {
+      const layer = document.createElement("span");
+      layer.className = `photo-${name}`;
+      layer.setAttribute("aria-hidden", "true");
+      photo.prepend(layer);
+    });
+    ["glare", "shade"].forEach((name) => {
+      const layer = document.createElement("span");
+      layer.className = `photo-${name}`;
+      layer.setAttribute("aria-hidden", "true");
+      photo.append(layer);
+    });
+
+    if (reduceMotion) return;
+
+    const reset = () => {
+      photo.style.setProperty("--pc-active", "0");
+      photo.style.setProperty("--pc-tilt", "0");
+      photo.style.setProperty("--pc-reach", "0");
+      photo.style.setProperty("--pc-rotate-x", "0deg");
+      photo.style.setProperty("--pc-rotate-y", "0deg");
+      photo.style.setProperty("--pc-shift-x", "0px");
+      photo.style.setProperty("--pc-shift-y", "0px");
+    };
+
+    photo.addEventListener("pointermove", (event) => {
+      const rect = photo.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const px = (event.clientX - rect.left) / rect.width;
+      const py = (event.clientY - rect.top) / rect.height;
+      const x = px * 2 - 1;
+      const y = py * 2 - 1;
+      const reach = Math.min(1, Math.hypot(x, y));
+      photo.style.setProperty("--pc-light-x", `${(px * rect.width).toFixed(1)}px`);
+      photo.style.setProperty("--pc-light-y", `${(py * rect.height).toFixed(1)}px`);
+      photo.style.setProperty("--pc-pointer-x", `${(px * 100).toFixed(2)}%`);
+      photo.style.setProperty("--pc-pointer-y", `${(py * 100).toFixed(2)}%`);
+      photo.style.setProperty("--pc-band-x", `${(50 + x * 15).toFixed(2)}%`);
+      photo.style.setProperty("--pc-band-y", `${(50 + y * 15).toFixed(2)}%`);
+      photo.style.setProperty("--pc-rotate-x", `${(y * 4).toFixed(2)}deg`);
+      photo.style.setProperty("--pc-rotate-y", `${(-x * 4).toFixed(2)}deg`);
+      photo.style.setProperty("--pc-shift-x", `${(x * 3).toFixed(2)}px`);
+      photo.style.setProperty("--pc-shift-y", `${(y * 3).toFixed(2)}px`);
+      photo.style.setProperty("--pc-reach", reach.toFixed(3));
+      photo.style.setProperty("--pc-tilt", reach.toFixed(3));
+      photo.style.setProperty("--pc-active", "1");
+    });
+    photo.addEventListener("pointerleave", reset);
+  });
+
+  const personModal = document.querySelector(".person-modal");
+  const personPanel = personModal.querySelector(".person-modal__panel");
+  let personReturn = null;
+
+  function openPersonModal(person) {
+    const name = person.querySelector(".person-name")?.textContent.trim() || "";
+    const role = person.querySelector(".person-role")?.textContent.trim() || "";
+    const groupLabel = person.closest(".t-lead, .t-group")?.querySelector(".team-label");
+    const sector = groupLabel ? groupLabel.childNodes[0].textContent.trim() : "";
+    const photo = person.querySelector(".photo img");
+    const modalPhoto = personModal.querySelector(".person-modal__photo img");
+
+    personModal.querySelector(".person-modal__sector").textContent = sector;
+    personModal.querySelector(".person-modal__name").textContent = name;
+    personModal.querySelector(".person-modal__role").textContent = role;
+
+    const list = personModal.querySelector(".person-modal__list");
+    list.replaceChildren();
+    person.querySelectorAll(".person-duties li").forEach((item) => {
+      const li = document.createElement("li");
+      li.textContent = item.textContent.trim();
+      list.append(li);
+    });
+
+    if (photo && photo.getAttribute("src")) {
+      modalPhoto.src = photo.dataset.full || photo.currentSrc || photo.src;
+      modalPhoto.alt = name;
+      modalPhoto.hidden = false;
+    } else {
+      modalPhoto.removeAttribute("src");
+      modalPhoto.hidden = true;
+    }
+
+    personReturn = document.activeElement;
+    personModal.hidden = false;
+    document.body.classList.add("person-open");
+    requestAnimationFrame(() => personModal.classList.add("is-open"));
+    personModal.querySelector(".person-modal__close").focus();
+  }
+
+  function closePersonModal() {
+    if (personModal.hidden) return;
+    personModal.classList.remove("is-open");
+    document.body.classList.remove("person-open");
+    const finish = () => {
+      personModal.hidden = true;
+      if (personReturn && personReturn.focus) personReturn.focus();
+    };
+    if (reduceMotion) finish();
+    else personPanel.addEventListener("transitionend", finish, { once: true });
+  }
+
+  personModal.querySelector(".person-modal__backdrop").addEventListener("click", closePersonModal);
+  personModal.querySelector(".person-modal__close").addEventListener("click", closePersonModal);
+
+  document.querySelectorAll(".person").forEach((person) => {
+    person.tabIndex = 0;
+    person.setAttribute("role", "button");
+    const name = person.querySelector(".person-name")?.textContent.trim() || "pessoa do time";
+    person.setAttribute("aria-label", `Ver detalhes de ${name}`);
+    person.addEventListener("click", () => openPersonModal(person));
   });
 
   // ============================================

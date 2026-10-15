@@ -36,6 +36,8 @@
   --accent-glow: rgba(123, 211, 122, 0.35);
   --warn: #f5b841;
   --alert: #ff7a66;
+  --gold: #DCAC6C;
+  --gold-soft: rgba(220, 172, 108, 0.16);
 
   --radius: 0.9rem;
   --label-col: 12rem;
@@ -471,8 +473,9 @@ body:not(.on-cover) .hint {
 
 .kicker-num {
   padding: 0.15rem 0.55rem;
-  border: 1px solid var(--line-strong);
+  border: 1px solid rgba(220, 172, 108, 0.45);
   border-radius: 999px;
+  color: var(--gold);
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.05em;
 }
@@ -1526,14 +1529,14 @@ body:not(.on-cover) .hint {
 .t-groups {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1.3rem 1.25rem;
+  gap: 0.85rem 1.25rem;
 }
 
 .t-group {
   grid-column: span var(--n);
   display: flex;
   flex-direction: column;
-  gap: 0.9rem;
+  gap: 0.6rem;
 }
 
 .t-people {
@@ -1579,7 +1582,14 @@ body:not(.on-cover) .hint {
 .person {
   display: flex;
   flex-direction: column;
-  gap: 0.7rem;
+  gap: 0.45rem;
+  cursor: pointer;
+}
+
+.person:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 4px;
+  border-radius: var(--radius);
 }
 
 .person.is-lead {
@@ -1588,7 +1598,8 @@ body:not(.on-cover) .hint {
 
 .photo {
   position: relative;
-  height: 8.6rem;
+  width: 100%;
+  height: 9.6rem;
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -1599,25 +1610,11 @@ body:not(.on-cover) .hint {
 
 .is-lead .photo {
   flex: 1;
+  width: 100%;
   height: auto;
-  min-height: 10rem;
+  min-height: 12rem;
+  aspect-ratio: auto;
   border-color: var(--line-strong);
-}
-
-/* Silhueta exibida enquanto não houver foto */
-.photo>i {
-  position: absolute;
-  left: 50%;
-  bottom: -1.4rem;
-  font-size: 8rem;
-  line-height: 1;
-  color: rgba(155, 226, 154, 0.1);
-  transform: translateX(-50%);
-}
-
-.is-lead .photo>i {
-  bottom: -2.2rem;
-  font-size: 14rem;
 }
 
 .photo img {
@@ -1626,9 +1623,15 @@ body:not(.on-cover) .hint {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 50% 25%;
+  object-position: center;
   filter: grayscale(1) contrast(1.05) brightness(0.95);
   transition: filter 0.6s var(--ease), transform 0.8s var(--ease);
+}
+
+.person.reveal .photo img {
+  object-position: center top;
+  transform: scale(1.12);
+  transform-origin: center top;
 }
 
 .photo::after {
@@ -1636,12 +1639,11 @@ body:not(.on-cover) .hint {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: linear-gradient(180deg, transparent 55%, rgba(4, 11, 5, 0.55) 100%);
+  background: linear-gradient(180deg, transparent 78%, rgba(4, 11, 5, 0.35) 100%);
 }
 
 .person:hover .photo img {
   filter: none;
-  transform: scale(1.03);
 }
 
 .person figcaption {
@@ -1957,7 +1959,7 @@ body:not(.on-cover) .hint {
   width: 0.45rem;
   height: 0.45rem;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--gold);
 }
 
 .pulse-dot::after {
@@ -1965,7 +1967,7 @@ body:not(.on-cover) .hint {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--gold);
   animation: ping 2s var(--ease) infinite;
 }
 
