@@ -417,6 +417,34 @@ body:not(.on-cover) .hint {
     visibility 0s;
 }
 
+/* Ícone decorativo gigante no fundo de cada slide */
+.slide {
+  isolation: isolate;
+}
+
+.slide-bg-icon {
+  position: absolute;
+  top: -5rem;
+  right: -3rem;
+  z-index: -1;
+  font-size: clamp(22rem, 38vw, 40rem);
+  line-height: 1;
+  color: var(--accent);
+  opacity: 0;
+  filter: blur(5px);
+  pointer-events: none;
+  transform: rotate(-10deg) scale(0.94);
+  transition:
+    opacity 1.2s var(--ease),
+    transform 1.6s var(--ease);
+}
+
+.slide.is-active .slide-bg-icon {
+  opacity: 0.05;
+  transform: rotate(-10deg);
+  transition-delay: 0.3s;
+}
+
 /* Área útil fixa de 16:9 — o conteúdo nunca rola */
 .slide-inner {
   width: min(100%, 86rem);
