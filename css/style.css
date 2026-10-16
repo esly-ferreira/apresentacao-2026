@@ -724,6 +724,27 @@ body:not(.on-cover) .hint {
   color: var(--muted);
 }
 
+.beliefs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: 2.5rem;
+}
+
+.beliefs article {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--line);
+}
+
+.beliefs p {
+  max-width: 24rem;
+  font-size: 1.05rem;
+  line-height: 1.4;
+  color: var(--soft);
+}
+
 /* Variação de destaque (slide de propósito) */
 .pillars-hero {
   column-gap: 3rem;
@@ -2446,6 +2467,7 @@ body:not(.on-cover) .hint {
     gap: 0.75rem;
   }
 
+  .beliefs,
   .pillars,
   .split,
   .cols,
