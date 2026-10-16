@@ -2162,19 +2162,24 @@ body:not(.on-cover) .hint {
   height: 0;
 }
 
-.orbit-node.is-left {
-  left: -8.49rem;
-  top: -7.13rem;
+.orbit-node.is-tl {
+  left: -7.84rem;
+  top: -7.84rem;
 }
 
-.orbit-node.is-right {
-  left: 8.49rem;
-  top: -7.13rem;
+.orbit-node.is-tr {
+  left: 7.84rem;
+  top: -7.84rem;
 }
 
-.orbit-node.is-bottom {
-  left: 0;
-  top: 11.09rem;
+.orbit-node.is-bl {
+  left: -7.84rem;
+  top: 7.84rem;
+}
+
+.orbit-node.is-br {
+  left: 7.84rem;
+  top: 7.84rem;
 }
 
 .orbit-mark {
@@ -2203,30 +2208,25 @@ body:not(.on-cover) .hint {
   color: var(--muted);
 }
 
-.orbit-node.is-left .orbit-copy,
-.orbit-node.is-right .orbit-copy {
+.orbit-node.is-tl .orbit-copy,
+.orbit-node.is-tr .orbit-copy,
+.orbit-node.is-bl .orbit-copy,
+.orbit-node.is-br .orbit-copy {
   position: absolute;
   top: 0;
   width: 15rem;
   transform: translateY(-50%);
 }
 
-.orbit-node.is-left .orbit-copy {
+.orbit-node.is-tl .orbit-copy,
+.orbit-node.is-bl .orbit-copy {
   right: 3.05rem;
   text-align: right;
 }
 
-.orbit-node.is-right .orbit-copy {
+.orbit-node.is-tr .orbit-copy,
+.orbit-node.is-br .orbit-copy {
   left: 3.05rem;
-}
-
-.orbit-node.is-bottom .orbit-copy {
-  position: absolute;
-  top: 2.85rem;
-  left: 0;
-  width: 16rem;
-  transform: translateX(-50%);
-  text-align: center;
 }
 
 .orbit-caption {
@@ -2387,9 +2387,10 @@ body:not(.on-cover) .hint {
   .orbit-node,
   .orbit-mark,
   .orbit-copy,
-  .orbit-node.is-left .orbit-copy,
-  .orbit-node.is-right .orbit-copy,
-  .orbit-node.is-bottom .orbit-copy {
+  .orbit-node.is-tl .orbit-copy,
+  .orbit-node.is-tr .orbit-copy,
+  .orbit-node.is-bl .orbit-copy,
+  .orbit-node.is-br .orbit-copy {
     position: static;
     width: auto;
     height: auto;
