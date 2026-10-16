@@ -534,7 +534,8 @@ body:not(.on-cover) .hint {
 .cover-title em,
 .final-title em,
 .pillars-hero h3 em,
-.closing em {
+.closing em,
+.orbit-caption em {
   font-style: italic;
   font-weight: 800;
   letter-spacing: -0.04em;
@@ -2058,7 +2059,189 @@ body:not(.on-cover) .hint {
   transform: translateX(0.3rem);
 }
 
-/* ================= 12 · Encerramento ================= */
+.slide-inner:has(.orbit) {
+  padding-bottom: 3.2rem;
+  gap: 1.15rem;
+}
+
+.slide-inner:has(.orbit) > .orbit {
+  margin-bottom: 0;
+}
+
+.slide-inner:has(.orbit) > .value {
+  margin-top: 0.85rem;
+  padding-top: 0.8rem;
+}
+
+.slide-inner:has(.orbit) > .value p {
+  font-size: 0.92rem;
+  line-height: 1.35;
+}
+
+.orbit {
+  position: relative;
+  height: 32rem;
+}
+
+.orbit-stage {
+  position: absolute;
+  left: 50%;
+  top: 11.6rem;
+  width: 0;
+  height: 0;
+}
+
+.orbit-fig {
+  position: absolute;
+  left: -13.2rem;
+  top: -13.2rem;
+  width: 26.4rem;
+  height: 26.4rem;
+  overflow: visible;
+}
+
+.orbit-fig circle {
+  fill: rgba(155, 226, 154, 0.04);
+  stroke: rgba(155, 226, 154, 0.32);
+  stroke-width: 1.25;
+  vector-effect: non-scaling-stroke;
+}
+
+.orbit-fig line {
+  stroke: var(--accent);
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  pathLength: 1;
+  opacity: 0.75;
+}
+
+.slide.is-active .orbit-fig line {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.9s var(--ease) 0.35s;
+}
+
+.orbit-core,
+.orbit-mark {
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--bg);
+}
+
+.orbit-core {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 7rem;
+  height: 7rem;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(220, 172, 108, 0.5);
+  background:
+    radial-gradient(circle at 50% 35%, rgba(220, 172, 108, 0.2), transparent 62%),
+    var(--bg);
+  box-shadow: 0 0 0 0.55rem var(--bg);
+  line-height: 1;
+}
+
+.orbit-core strong {
+  font-size: 2.2rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background: linear-gradient(135deg, #ffffff 10%, #d8f5c8 42%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.orbit-node {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.orbit-node.is-left {
+  left: -8.49rem;
+  top: -7.13rem;
+}
+
+.orbit-node.is-right {
+  left: 8.49rem;
+  top: -7.13rem;
+}
+
+.orbit-node.is-bottom {
+  left: 0;
+  top: 11.09rem;
+}
+
+.orbit-mark {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 4.4rem;
+  height: 4.4rem;
+  transform: translate(-50%, -50%);
+  border: 1px solid var(--line-strong);
+  box-shadow: 0 0 0 0.45rem var(--bg);
+  color: var(--accent);
+  font-size: 1.65rem;
+}
+
+.orbit-copy h3 {
+  font-size: 1.2rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+.orbit-copy p {
+  margin-top: 0.25rem;
+  font-size: 0.92rem;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+.orbit-node.is-left .orbit-copy,
+.orbit-node.is-right .orbit-copy {
+  position: absolute;
+  top: 0;
+  width: 15rem;
+  transform: translateY(-50%);
+}
+
+.orbit-node.is-left .orbit-copy {
+  right: 3.05rem;
+  text-align: right;
+}
+
+.orbit-node.is-right .orbit-copy {
+  left: 3.05rem;
+}
+
+.orbit-node.is-bottom .orbit-copy {
+  position: absolute;
+  top: 2.85rem;
+  left: 0;
+  width: 16rem;
+  transform: translateX(-50%);
+  text-align: center;
+}
+
+.orbit-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  text-align: center;
+  font-size: 1.35rem;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  color: var(--soft);
+}
+
+/* ================= 13 · Encerramento ================= */
 .slide-final::before {
   content: "";
   position: absolute;
@@ -2173,6 +2356,57 @@ body:not(.on-cover) .hint {
 
   .slide-title {
     font-size: 2.4rem;
+  }
+
+  .orbit {
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .orbit-stage {
+    position: static;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    width: auto;
+    height: auto;
+  }
+
+  .orbit-fig {
+    display: none;
+  }
+
+  .orbit-core {
+    position: static;
+    transform: none;
+    margin-bottom: 0.4rem;
+  }
+
+  .orbit-node,
+  .orbit-mark,
+  .orbit-copy,
+  .orbit-node.is-left .orbit-copy,
+  .orbit-node.is-right .orbit-copy,
+  .orbit-node.is-bottom .orbit-copy {
+    position: static;
+    width: auto;
+    height: auto;
+    transform: none;
+    text-align: left;
+  }
+
+  .orbit-node {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+  }
+
+  .orbit-caption {
+    position: static;
+    text-align: left;
+    font-size: 1.15rem;
   }
 
   .cover-title {
