@@ -644,6 +644,12 @@ body:not(.on-cover) .hint {
   transform: rotate(45deg);
 }
 
+.metrics b {
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
 /* ================= Pilares (colunas editoriais) ================= */
 .pillars {
   display: grid;
