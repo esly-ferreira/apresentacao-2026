@@ -280,7 +280,7 @@
   border-radius: 0.65rem;
   background: rgba(4, 11, 5, 0.45);
   color: var(--soft);
-  font-size: 1rem;
+  font-size: calc(1rem * var(--t));
   cursor: pointer;
 }
 
@@ -386,7 +386,7 @@
 }
 
 .person-modal__sector {
-  font-size: 0.72rem;
+  font-size: calc(0.72rem * var(--t));
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -395,7 +395,7 @@
 
 .person-modal__name {
   margin: 0.15rem 0 0;
-  font-size: 2rem;
+  font-size: calc(2rem * var(--t));
   font-weight: 650;
   letter-spacing: -0.03em;
   line-height: 1.1;
@@ -404,7 +404,7 @@
 
 .person-modal__role {
   margin: 0 0 0.85rem;
-  font-size: 1rem;
+  font-size: calc(1rem * var(--t));
   color: var(--muted);
 }
 
@@ -421,7 +421,7 @@
   position: relative;
   padding-left: 1.2rem;
   color: var(--soft);
-  font-size: 0.98rem;
+  font-size: calc(0.98rem * var(--t));
   line-height: 1.45;
 }
 

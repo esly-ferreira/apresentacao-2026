@@ -4,10 +4,14 @@
 (() => {
   "use strict";
 
-  const SPLINE_VIEWER_SRC = "https://unpkg.com/@splinetool/viewer@1.12.13/build/spline-viewer.js";
-  const SPLINE_SCENE_URL = "https://prod.spline.design/03bthj2GJ0HDxTps/scene.splinecode";
+  const SPLINE_VIEWER_SRC =
+    "https://cdn.spline.design/@splinetool/viewer@2.0.95/build/spline-viewer.js";
+  const SPLINE_SCENE_URL =
+    "https://prod.spline.design/HYpRiN6iBJkaZ8A9/scene.splinecode";
 
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const reduceMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
   const numberFormat = new Intl.NumberFormat("pt-BR", { useGrouping: false });
   const pad = (n) => String(n).padStart(2, "0");
 
@@ -23,6 +27,7 @@
   const fullscreenBtn = document.querySelector('[data-action="fullscreen"]');
 
   let current = -1;
+  let coverClassTimer = 0;
 
   counterTotal.textContent = pad(total);
 
@@ -66,7 +71,12 @@
     topbarLabel.textContent = slides[index].dataset.label;
     prevBtn.disabled = index === 0;
     nextBtn.disabled = index === total - 1;
-    document.body.classList.toggle("on-cover", index === 0);
+    clearTimeout(coverClassTimer);
+    if (index === 0) document.body.classList.add("on-cover");
+    else
+      coverClassTimer = setTimeout(() => {
+        if (current !== 0) document.body.classList.remove("on-cover");
+      }, 700);
     history.replaceState(null, "", `#${index + 1}`);
 
     slides[index].scrollTop = 0;
@@ -165,7 +175,7 @@
       wheelLocked = true;
       direction > 0 ? next() : prev();
     },
-    { passive: true }
+    { passive: true },
   );
 
   let touchX = 0;
@@ -179,7 +189,7 @@
       touchY = touch.clientY;
       touchTime = Date.now();
     },
-    { passive: true }
+    { passive: true },
   );
   window.addEventListener(
     "touchend",
@@ -191,11 +201,14 @@
 
       if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.2) {
         dx < 0 ? next() : prev();
-      } else if (Math.abs(dy) > 80 && !canScroll(slides[current], dy < 0 ? 1 : -1)) {
+      } else if (
+        Math.abs(dy) > 80 &&
+        !canScroll(slides[current], dy < 0 ? 1 : -1)
+      ) {
         dy < 0 ? next() : prev();
       }
     },
-    { passive: true }
+    { passive: true },
   );
 
   // ============================================
@@ -213,7 +226,10 @@
     const icon = fullscreenBtn.querySelector("i");
     const isFull = Boolean(document.fullscreenElement);
     icon.className = isFull ? "ph ph-corners-in" : "ph ph-corners-out";
-    fullscreenBtn.setAttribute("aria-label", isFull ? "Sair da tela cheia" : "Tela cheia");
+    fullscreenBtn.setAttribute(
+      "aria-label",
+      isFull ? "Sair da tela cheia" : "Tela cheia",
+    );
   });
 
   // ============================================
@@ -224,7 +240,8 @@
       const target = parseFloat(el.dataset.count);
       const prefix = el.dataset.prefix || "";
       const suffix = el.dataset.suffix || "";
-      const render = (value) => (el.textContent = prefix + numberFormat.format(value) + suffix);
+      const render = (value) =>
+        (el.textContent = prefix + numberFormat.format(value) + suffix);
 
       if (reduceMotion) {
         render(target);
@@ -233,16 +250,19 @@
 
       render(0);
       const duration = 1400;
-      el._counterTimer = setTimeout(() => {
-        const start = performance.now();
-        const tick = (now) => {
-          const progress = Math.min(1, (now - start) / duration);
-          const eased = 1 - Math.pow(1 - progress, 4);
-          render(Math.round(target * eased));
-          if (progress < 1) el._counterFrame = requestAnimationFrame(tick);
-        };
-        el._counterFrame = requestAnimationFrame(tick);
-      }, 450 + i * 120);
+      el._counterTimer = setTimeout(
+        () => {
+          const start = performance.now();
+          const tick = (now) => {
+            const progress = Math.min(1, (now - start) / duration);
+            const eased = 1 - Math.pow(1 - progress, 4);
+            render(Math.round(target * eased));
+            if (progress < 1) el._counterFrame = requestAnimationFrame(tick);
+          };
+          el._counterFrame = requestAnimationFrame(tick);
+        },
+        450 + i * 120,
+      );
     });
   }
 
@@ -276,13 +296,16 @@
     const reveal = () => {
       if (viewer !== instance) return;
       hideSplineLogo(instance);
+      pullCameraBack(instance);
       cover3d.classList.add("is-ready");
     };
 
     instance.addEventListener("load-complete", reveal, { once: true });
     cover3d.appendChild(instance);
 
-    [600, 1500, 3000].forEach((ms) => setTimeout(() => viewer === instance && hideSplineLogo(instance), ms));
+    [600, 1500, 3000].forEach((ms) =>
+      setTimeout(() => viewer === instance && hideSplineLogo(instance), ms),
+    );
     setTimeout(reveal, 5000);
   }
 
@@ -293,7 +316,18 @@
       cover3d.classList.remove("is-ready");
       viewer.remove();
       viewer = null;
-    }, 900);
+    }, 1000);
+  }
+
+  function pullCameraBack(instance) {
+    const spline = instance._spline;
+    const orbit = spline?.controls?.orbitControls;
+    if (!spline || !orbit || orbit._coverDolly) return;
+    orbit._coverDolly = true;
+    const current = orbit.spherical?.radius;
+    if (current)
+      orbit.maxDistance = Math.max(orbit.maxDistance || 0, current * 2);
+    spline.setZoom(0.72);
   }
 
   function hideSplineLogo(instance) {
@@ -301,7 +335,8 @@
     if (!root || root.getElementById("hide-spline-logo")) return;
     const style = document.createElement("style");
     style.id = "hide-spline-logo";
-    style.textContent = "#logo, a[href*='spline.design'] { display: none !important; }";
+    style.textContent =
+      "a[href*='spline.design'] { display: none !important; }";
     root.appendChild(style);
   }
 
@@ -348,8 +383,14 @@
       const x = px * 2 - 1;
       const y = py * 2 - 1;
       const reach = Math.min(1, Math.hypot(x, y));
-      photo.style.setProperty("--pc-light-x", `${(px * rect.width).toFixed(1)}px`);
-      photo.style.setProperty("--pc-light-y", `${(py * rect.height).toFixed(1)}px`);
+      photo.style.setProperty(
+        "--pc-light-x",
+        `${(px * rect.width).toFixed(1)}px`,
+      );
+      photo.style.setProperty(
+        "--pc-light-y",
+        `${(py * rect.height).toFixed(1)}px`,
+      );
       photo.style.setProperty("--pc-pointer-x", `${(px * 100).toFixed(2)}%`);
       photo.style.setProperty("--pc-pointer-y", `${(py * 100).toFixed(2)}%`);
       photo.style.setProperty("--pc-band-x", `${(50 + x * 15).toFixed(2)}%`);
@@ -374,7 +415,9 @@
   function setModalPhoto(photo, name) {
     const modalPhoto = modalPhotoBox.querySelector("img");
     const token = ++photoToken;
-    const thumb = photo?.getAttribute("src") ? photo.currentSrc || photo.src : "";
+    const thumb = photo?.getAttribute("src")
+      ? photo.currentSrc || photo.src
+      : "";
     const full = photo?.dataset.full || thumb;
 
     modalPhoto.onload = modalPhoto.onerror = null;
@@ -388,7 +431,10 @@
       return;
     }
 
-    modalPhotoBox.style.setProperty("--thumb", `url("${thumb.replace(/"/g, "%22")}")`);
+    modalPhotoBox.style.setProperty(
+      "--thumb",
+      `url("${thumb.replace(/"/g, "%22")}")`,
+    );
     modalPhotoBox.classList.add("is-loading");
     modalPhoto.hidden = false;
 
@@ -411,8 +457,12 @@
   function openPersonModal(person) {
     const name = person.querySelector(".person-name")?.textContent.trim() || "";
     const role = person.querySelector(".person-role")?.textContent.trim() || "";
-    const groupLabel = person.closest(".t-lead, .t-group")?.querySelector(".team-label");
-    const sector = groupLabel ? groupLabel.childNodes[0].textContent.trim() : "";
+    const groupLabel = person
+      .closest(".t-lead, .t-group")
+      ?.querySelector(".team-label");
+    const sector = groupLabel
+      ? groupLabel.childNodes[0].textContent.trim()
+      : "";
     const photo = person.querySelector(".photo img");
 
     personModal.querySelector(".person-modal__sector").textContent = sector;
@@ -448,13 +498,19 @@
     else personPanel.addEventListener("transitionend", finish, { once: true });
   }
 
-  personModal.querySelector(".person-modal__backdrop").addEventListener("click", closePersonModal);
-  personModal.querySelector(".person-modal__close").addEventListener("click", closePersonModal);
+  personModal
+    .querySelector(".person-modal__backdrop")
+    .addEventListener("click", closePersonModal);
+  personModal
+    .querySelector(".person-modal__close")
+    .addEventListener("click", closePersonModal);
 
   document.querySelectorAll(".person").forEach((person) => {
     person.tabIndex = 0;
     person.setAttribute("role", "button");
-    const name = person.querySelector(".person-name")?.textContent.trim() || "pessoa do time";
+    const name =
+      person.querySelector(".person-name")?.textContent.trim() ||
+      "pessoa do time";
     person.setAttribute("aria-label", `Ver detalhes de ${name}`);
     person.addEventListener("click", () => openPersonModal(person));
 

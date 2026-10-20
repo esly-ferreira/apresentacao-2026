@@ -427,7 +427,7 @@ body:not(.on-cover) .hint {
   padding: 6rem 5.5rem 5.5rem;
   display: flex;
   flex-direction: column;
-  gap: 2.25rem;
+  gap: 2.2em;
 }
 
 /* Elementos entram em cascata quando o slide fica ativo (--d = ordem) */
